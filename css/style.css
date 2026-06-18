@@ -170,7 +170,8 @@ body:has(button:hover) #cursor-trail { width: 48px; height: 48px; border-color: 
 .btn-contact:hover { opacity: .9; transform: translateY(-1px); }
 .hamburger {
   display: none; flex-direction: column; gap: 5px;
-  background: none; border: none; cursor: none; padding: 4px; margin-left: auto;
+  background: none; border: none; cursor: pointer; padding: 8px; margin-left: auto;
+  position: relative; z-index: 101;
 }
 .hamburger span {
   display: block; width: 22px; height: 2px;
@@ -343,9 +344,10 @@ body:has(button:hover) #cursor-trail { width: 48px; height: 48px; border-color: 
   background: var(--card); border: 1px solid var(--border-hi);
   box-shadow: 0 8px 24px rgba(0,0,0,.4);
   animation: floatBadge 5s ease-in-out infinite;
+  z-index: 2;
 }
-.badge-exp { bottom: 10px; left: -30px; animation-delay: -2s; }
-.badge-proj { top: 20px; right: -30px; }
+.badge-exp { bottom: 10px; left: -10px; animation-delay: -2s; }
+.badge-proj { top: 20px; right: -10px; }
 .badge-num { font-size: 1.3rem; font-weight: 800; color: var(--primary); font-family: var(--fh); line-height: 1; }
 .badge-txt { font-size: .65rem; color: var(--sub); font-family: var(--fm); }
 @keyframes floatBadge { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
@@ -434,19 +436,14 @@ body:has(button:hover) #cursor-trail { width: 48px; height: 48px; border-color: 
   border-radius: 10px; padding: .9rem .5rem; transition: border-color .2s;
 }
 .astat:hover { border-color: var(--primary); }
-.astat-top {
-  display: flex; align-items: baseline; justify-content: center; gap: 1px; line-height: 1;
-}
 .astat-n {
   font-size: 1.6rem; font-weight: 800; font-family: var(--fh);
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   line-height: 1;
 }
-.astat-suffix {
-  color: var(--primary); font-size: 1.3rem; font-weight: 800; font-family: var(--fh);
-}
-.astat-l { font-size: .68rem; color: var(--dim); font-family: var(--fm); margin-top: 5px; }
+.astat span { color: var(--primary); -webkit-text-fill-color: var(--primary); font-size:1.4rem; font-weight:800; }
+.astat-l { font-size: .68rem; color: var(--dim); font-family: var(--fm); margin-top: 3px; }
 
 /* ════════════════════════════════════════
    SKILLS
@@ -502,65 +499,31 @@ body:has(button:hover) #cursor-trail { width: 48px; height: 48px; border-color: 
   background: var(--card); border: 1px solid var(--border); border-radius: 16px;
   padding: 1.75rem; position: relative; overflow: hidden;
   display: flex; flex-direction: column; transition: all .35s var(--ease);
-  /* Cards in a row share the same height — push links to bottom */
-  justify-content: space-between;
 }
 .proj-card:hover {
   border-color: rgba(16,185,129,.4); transform: translateY(-6px);
   box-shadow: 0 20px 60px rgba(16,185,129,.1);
 }
-
-/* ── FEATURED CARD ── */
-.proj-featured {
-  grid-column: span 2; padding: 0; overflow: hidden;
-  /* Don't stretch height — let content define it */
-  align-self: start;
-}
+.proj-featured { grid-column: span 2; padding: 0; overflow: hidden; }
 .proj-featured-inner {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
-  /* Remove height:100% so card doesn't inflate */
+  display: grid; grid-template-columns: 1.1fr 1fr; align-items: stretch;
 }
-.proj-featured-content {
-  padding: 1.75rem; display: flex; flex-direction: column;
-  justify-content: flex-start; gap: 0;
-}
-/* Push links to bottom inside featured content */
-.proj-featured-content .proj-links { margin-top: auto; padding-top: 1.25rem; }
-
+.proj-featured-content { padding: 1.75rem; display: flex; flex-direction: column; }
 .proj-featured-img {
-  position: relative; overflow: hidden;
+  position: relative; min-height: 280px; overflow: hidden;
   border-left: 1px solid var(--border);
-  border-radius: 0 16px 16px 0;
-  background: var(--bg);
-  /* Fixed height so it doesn't inflate the card */
-  max-height: 380px; min-height: 280px;
 }
 .proj-featured-img img {
-  width: 100%; height: 100%; object-fit: cover; object-position: top left;
-  transition: transform .5s var(--ease); display: block;
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  display: block; transition: transform .5s ease;
 }
 .proj-featured:hover .proj-featured-img img { transform: scale(1.04); }
-
-/* ── REGULAR CARD SCREENSHOT STRIP ── */
-.proj-screenshot {
-  margin: -1.75rem -1.75rem 1.25rem -1.75rem;
-  overflow: hidden; border-radius: 16px 16px 0 0;
-  height: 180px; background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0; /* never squish the screenshot */
+.proj-featured-img::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, var(--card) 0%, transparent 15%);
+  pointer-events: none;
 }
-.proj-screenshot img {
-  width: 100%; height: 100%; object-fit: cover; object-position: top;
-  transition: transform .5s var(--ease);
-}
-.proj-card:hover .proj-screenshot img { transform: scale(1.05); }
-
-/* Regular card body — group everything except links */
-.proj-card-body {
-  display: flex; flex-direction: column; flex: 1;
-}
-/* Push links to card bottom on regular cards */
-.proj-card:not(.proj-featured) .proj-links { margin-top: auto; padding-top: 1rem; }
 .proj-glow {
   position: absolute; top: -40px; right: -40px;
   width: 120px; height: 120px; border-radius: 50%;
@@ -579,7 +542,7 @@ body:has(button:hover) #cursor-trail { width: 48px; height: 48px; border-color: 
 .badge-wip { background: rgba(245,158,11,.1); color: var(--warning); border-color: rgba(245,158,11,.3); }
 .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); animation: pulseDot 2s ease infinite; }
 .proj-name { font-family: var(--fh); font-size: 1.15rem; font-weight: 800; margin-bottom: .5rem; letter-spacing: -.02em; }
-.proj-desc { font-size: .86rem; color: var(--sub); line-height: 1.7; margin-bottom: 1rem; }
+.proj-desc { font-size: .86rem; color: var(--sub); line-height: 1.7; flex: 1; margin-bottom: 1rem; }
 .proj-features {
   display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: .75rem;
 }
@@ -848,4 +811,36 @@ textarea:-webkit-autofill:focus {
 
     transition:
         background-color 5000s ease-in-out 0s;
+}
+/* ════════════════════════════════════════
+   PROJECT SCREENSHOTS
+════════════════════════════════════════ */
+.proj-screenshot {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--border);
+}
+.proj-featured .proj-screenshot {
+  height: 220px;
+}
+.proj-screenshot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  transition: transform .5s ease;
+}
+.proj-card:hover .proj-screenshot img {
+  transform: scale(1.04);
+}
+.proj-screenshot-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, var(--card) 100%);
+  pointer-events: none;
 }

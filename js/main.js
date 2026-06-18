@@ -2,6 +2,29 @@
    MAIN.JS — Vikash Kumar Portfolio
 ════════════════════════════════════════ */
 
+/* ── MOBILE NAV (HAMBURGER) — bind immediately, no dependency on
+      AOS/loader/cursor setup so it always works on first tap ── */
+(function () {
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  function closeMobileNav() {
+    hamburger?.classList.remove('open');
+    mobileNav?.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  hamburger?.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileNav?.classList.toggle('open');
+    document.body.style.overflow = mobileNav?.classList.contains('open') ? 'hidden' : '';
+  });
+
+  document.querySelectorAll('.mob-link').forEach(link => {
+    link.addEventListener('click', closeMobileNav);
+  });
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── AOS INIT ── */
@@ -211,32 +234,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── ANIMATED STAT COUNTERS (ABOUT) ── */
   const statNums = document.querySelectorAll('.astat-n');
-  let countersRan = false;
-
-  function runCounters() {
-    if (countersRan) return;
-    const statsSection = document.querySelector('.about-stats');
-    if (!statsSection) return;
-
-    const rect = statsSection.getBoundingClientRect();
-    const inView = rect.top < window.innerHeight - 50;
-    if (!inView) return;
-
-    countersRan = true;
-
-    statNums.forEach((el, i) => {
-      const target = parseInt(el.dataset.count, 10) || 0;
-      el.textContent = '0';
-
-      setTimeout(() => {
-        const duration = 1400;
+  const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10) || 0;
+        const duration = 1200;
         const startTime = performance.now();
 
         function step(now) {
-          const elapsed = now - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          el.textContent = Math.floor(eased * target);
+          const progress = Math.min((now - startTime) / duration, 1);
+          const value = Math.floor(progress * target);
+          el.textContent = value;
           if (progress < 1) {
             requestAnimationFrame(step);
           } else {
@@ -244,14 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         requestAnimationFrame(step);
-      }, i * 100); // stagger each counter slightly
+        statObserver.unobserve(el);
+      }
     });
-  }
-
-  // Check on scroll AND after loader finishes
-  window.addEventListener('scroll', runCounters, { passive: true });
-  // Wait for loader to be fully hidden before checking viewport
-  setTimeout(runCounters, 2800);
+  }, { threshold: 0.5 });
+  statNums.forEach(el => statObserver.observe(el));
 
   /* ── CONTACT FORM VALIDATION + SUBMIT ── */
   const form = document.getElementById('contact-form');
